@@ -1,15 +1,19 @@
 package message.format.file;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 import message.Subject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
+ * v1
  * 역할일치? - no.
  * String actual = fileMessage.create(LocalDateTime.now());
  *
@@ -23,6 +27,24 @@ import org.junit.jupiter.params.provider.ValueSource;
  * 객체로 보기 보다는 범용적 기능을 가진 구현체로 볼 수 있다.
  *
  */
+
+/**
+ * v2
+ *
+ * 역할일치?
+ * 객체의 create 메서드를 통해 일관성을 가진, file message 포멧의 메세지(view) 를 생성한다.
+ *
+ * test suit 복잡도?
+ * fileMessage 생성에 필요한 subject, message 만을 전달하고 있어 복잡도가 높지 않다.
+ *
+ * 테스트 코드의 이상한점?
+ * 의도한 메세지 view 가 생성되는것을 확인하기 위해, DateTimeFormatter 를 테스트 코드에 작성하였다.
+ * DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+ *
+ * 객체가 생성하는 message(=view) 와 동일한 방식으로, 테스트 코드에서 비교용 view 데이터를 생성한다.
+ * 객체의 역할이 view 생성 이기 때문에, view 결과물을 비교할 다른 방법은 없을것 같다.
+ *
+ */
 class FileMessageTest {
     @DisplayName("blank, null, empty 이면 메세지가 생성 되지 않습니다.")
     @ParameterizedTest
@@ -31,7 +53,7 @@ class FileMessageTest {
     void test(String sMessage){
         //given
         //when
-        Throwable actual = Assertions.catchThrowable(()-> new FileMessage(Subject.CLIENT, sMessage));
+        Throwable actual = Assertions.catchThrowable(()-> new FileMessage(LocalDateTime.now(), Subject.CLIENT, sMessage));
 
         //then
         Assertions.assertThat(actual).isNotNull();
@@ -43,7 +65,7 @@ class FileMessageTest {
     void test1(String sMessage){
         //given
         //when
-        Throwable actual = Assertions.catchThrowable(()-> new FileMessage(Subject.CLIENT, sMessage));
+        Throwable actual = Assertions.catchThrowable(()-> new FileMessage(LocalDateTime.now(), Subject.CLIENT, sMessage));
 
         //then
         Assertions.assertThat(actual).isNull();
@@ -51,15 +73,24 @@ class FileMessageTest {
 
     @DisplayName("file message 포멧을 가진 메세지를 생성합니다.")
     @ParameterizedTest
-    @ValueSource(strings = {"test message","not empty message", "  not blank message"})
-    void test2(String sMessage){
+    @CsvSource(value = {
+        "SERVER, test message","CLIENT, test message", "INFO, test message", "WARN, test message",
+        "SERVER,   not blank message","CLIENT,   not blank message", "INFO,   not blank message", "WARN,   not blank message"
+    })
+    void test2(String sSubject, String sMessage){
         //given
-        FileMessage fileMessage = new FileMessage(Subject.CLIENT, sMessage);
+        LocalDateTime now = LocalDateTime.now();
+        Subject subject = Subject.find(sSubject).orElseThrow(()-> new RuntimeException("not exist"));
+
+        FileMessage fileMessage = new FileMessage(now, subject, sMessage);
 
         //when
-        String actual = fileMessage.create(LocalDateTime.now());
+        String actual = fileMessage.create();
 
         //then
-        Assertions.assertThat(actual).containsPattern(Pattern.compile("\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) \\S* \\s*"));
+        DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+
+        Assertions.assertThat(actual)
+            .isEqualTo(MessageFormat.format("{0} {1} {2}", MESSAGE_TIME_FORMAT.format(now), subject.getValue(), sMessage));
     }
 }

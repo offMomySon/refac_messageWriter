@@ -1,6 +1,9 @@
 package message;
 
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
 public enum Subject {
@@ -10,5 +13,11 @@ public enum Subject {
 
     Subject(String value) {
         this.value = value;
+    }
+
+    public static Optional<Subject> find(String name){
+        return Stream.of(values())
+            .filter(s -> StringUtils.equals(s.name(), name))
+            .findAny();
     }
 }
