@@ -1,4 +1,5 @@
 import java.util.Objects;
+import lombok.Getter;
 import lombok.NonNull;
 
 /**
@@ -6,18 +7,11 @@ import lombok.NonNull;
  * 메세지 출력 위치를 지정하기 위한 vo 객체.
  *
  */
+@Getter
 public class Destination {
-    @Override
-    public String toString() {
-        return "Destination{" +
-            "address=" + address +
-            ", usage=" + usage +
-            '}';
-    }
-
     private final Address address;
-    private final Usage usage;
 
+    private final Usage usage;
     public Destination(@NonNull Address address, @NonNull Usage usage) {
         this.address = address;
         this.usage = usage;
@@ -34,5 +28,13 @@ public class Destination {
     @Override
     public int hashCode() {
         return Objects.hash(address, usage);
+    }
+
+    @Override
+    public String toString() {
+        return "Destination{" +
+            "address=" + address +
+            ", usage=" + usage +
+            '}';
     }
 }
