@@ -1,6 +1,6 @@
 package message.format.simpleMessageFormat;
 
-import message.NoticeType;
+import message.NoticePrefix;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,8 +24,8 @@ class PrefixMessageTest {
 
     @DisplayName("NoticeType 으로 객체를 생성합니다.")
     @ParameterizedTest
-    @EnumSource(value = NoticeType.class)
-    void test1(NoticeType type){
+    @EnumSource(value = NoticePrefix.class)
+    void test1(NoticePrefix type){
         //given
         //when
         Throwable actual = Assertions.catchThrowable(() -> PrefixMessage.of(type));
@@ -36,8 +36,8 @@ class PrefixMessageTest {
 
     @DisplayName("prefix 메세지를 생성합니다.")
     @ParameterizedTest
-    @EnumSource(value = NoticeType.class)
-    void test2(NoticeType type){
+    @EnumSource(value = NoticePrefix.class)
+    void test2(NoticePrefix type){
         //given
         PrefixMessage prefixMessage = PrefixMessage.of(type);
 
@@ -45,7 +45,7 @@ class PrefixMessageTest {
         String actual = prefixMessage.create();
 
         //then
-        Assertions.assertThat(actual).isEqualTo(type.getPrefix());
+        Assertions.assertThat(actual).isEqualTo(type.getValue());
     }
 
 }

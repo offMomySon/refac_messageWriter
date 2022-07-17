@@ -1,3 +1,8 @@
+package writer;
+
+import common.Destination;
+import common.Destinations;
+import common.Usage;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -6,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import message.Message;
@@ -36,10 +43,26 @@ public class MessageWriter {
         write(outputStreamMap.get(destination), message);
     }
 
-    public void writeAll(Usage usage, Message message){
+    public void writeAll(Predicate<Destination> destinationPredicate, Message message){
         outputStreamMap.keySet().stream()
-            .filter(d-> d.getUsage() == usage)
+            .filter(destinationPredicate)
             .forEach(d -> write(d, message));
+    }
+
+    public void writeAll2(Function<Destinations, Destinations> destinationConverter, Message message){
+        Destinations destinations = new Destinations(this.outputStreamMap.keySet());
+
+        Destinations findDestinations = destinationConverter.apply(destinations);
+
+        findDestinations.forEach(d-> write(d, message));
+    }
+
+    public void writeAll3(Destinations destinations, Message message){
+        destinations.forEach(d-> write(d, message));
+    }
+
+    public void writeAll4(Destinations destinations, Message message){
+        destinations.forEach3(d-> write(d, message), this.outputStreamMap.keySet());
     }
 
     private static void write(BufferedWriter writer, Message message){

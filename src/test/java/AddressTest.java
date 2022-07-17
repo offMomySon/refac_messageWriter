@@ -1,3 +1,4 @@
+import common.Address;
 import java.util.Objects;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

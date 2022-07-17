@@ -1,3 +1,6 @@
+import common.Address;
+import common.Destination;
+import common.Usage;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;

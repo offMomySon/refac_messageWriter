@@ -4,11 +4,14 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import message.Subject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -68,19 +71,16 @@ class FileMessageTest {
         Throwable actual = Assertions.catchThrowable(()-> new FileMessage(LocalDateTime.now(), Subject.CLIENT, sMessage));
 
         //then
-        Assertions.assertThat(actual).isNull();
+        Assertions.assertThat(actual).doesNotThrowAnyException();
     }
 
     @DisplayName("file message 포멧을 가진 메세지를 생성합니다.")
     @ParameterizedTest
-    @CsvSource(value = {
-        "SERVER, test message","CLIENT, test message", "INFO, test message", "WARN, test message",
-        "SERVER,   not blank message","CLIENT,   not blank message", "INFO,   not blank message", "WARN,   not blank message"
-    })
-    void test2(String sSubject, String sMessage){
+    @MethodSource("provideMessageFormatTestSuite")
+    void test2(Subject subject, String sMessage){
         //given
         LocalDateTime now = LocalDateTime.now();
-        Subject subject = Subject.find(sSubject).orElseThrow(()-> new RuntimeException("not exist"));
+//        Subject subject = Subject.find(sSubject).orElseThrow(()-> new RuntimeException("not exist"));
 
         FileMessage fileMessage = new FileMessage(now, subject, sMessage);
 
@@ -91,6 +91,15 @@ class FileMessageTest {
         DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 
         Assertions.assertThat(actual)
-            .isEqualTo(MessageFormat.format("{0} {1} {2}", MESSAGE_TIME_FORMAT.format(now), subject.getValue(), sMessage));
+            .contains(MESSAGE_TIME_FORMAT.format(now))
+            .contains(subject.getValue())
+            .contains(sMessage);
     }
+
+    private static Stream<Arguments> provideMessageFormatTestSuite(){
+        return Stream.of(Subject.values())
+            .flatMap(s-> Stream.of("test mssage", "not blank message")
+                .map(m-> Arguments.of(s,m)) );
+    }
+
 }

@@ -1,3 +1,5 @@
+package common;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -75,7 +77,7 @@ public class Address {
 
     @Override
     public String toString() {
-        return "Address{" +
+        return "common.Address{" +
             "value='" + value + '\'' +
             '}';
     }

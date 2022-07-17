@@ -2,7 +2,7 @@ package message.format.simpleMessageFormat;
 
 import java.text.MessageFormat;
 import lombok.NonNull;
-import message.NoticeType;
+import message.NoticePrefix;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -22,8 +22,8 @@ public class PrefixMessage {
         this.message = message;
     }
 
-    public static PrefixMessage of(@NonNull NoticeType noticeType){
-        return new PrefixMessage(noticeType.getPrefix());
+    public static PrefixMessage of(@NonNull NoticePrefix noticePrefix){
+        return new PrefixMessage(noticePrefix.getValue());
     }
 
     public String create() {

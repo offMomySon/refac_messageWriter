@@ -1,3 +1,6 @@
+import common.Address;
+import common.Destination;
+import common.Usage;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import writer.MessageWriter;
 
 /**
  * 역할 일치?
@@ -45,7 +49,7 @@ class MessageWriterTest {
         Map<Destination, OutputStream> sourceMap = sources.stream()
             .map(destination -> Map.entry(destination, new ByteArrayOutputStream()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (p1, p2) -> p1));
-        Destination target = sources.stream().findAny().orElseThrow(()-> new RuntimeException("not exist Destination"));
+        Destination target = sources.stream().findAny().orElseThrow(()-> new RuntimeException("not exist common.Destination"));
 
         Message message = new GenericMessage("test message.");
         MessageWriter messageWriter = MessageWriter.of(sourceMap);
@@ -71,7 +75,7 @@ class MessageWriterTest {
         Map<Destination, OutputStream> sourceMap = sources.stream()
             .map(destination -> Map.entry(destination, new ByteArrayOutputStream()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (p1, p2) -> p1));
-        Destination target = sources.stream().findAny().orElseThrow(()-> new RuntimeException("not exist Destination"));
+        Destination target = sources.stream().findAny().orElseThrow(()-> new RuntimeException("not exist common.Destination"));
 
         Message message = new GenericMessage("test message.");
         MessageWriter messageWriter = MessageWriter.of(sourceMap);
@@ -104,7 +108,7 @@ class MessageWriterTest {
         Message message = new GenericMessage("test message.");
         MessageWriter messageWriter = MessageWriter.of(sourceMap);
 
-        messageWriter.writeAll(usage, message);
+        messageWriter.writeAll(d->d.getUsage() == usage, message);
 
         //when
         List<String> actuals = sources.stream()
@@ -131,7 +135,7 @@ class MessageWriterTest {
         Message message = new GenericMessage("test message.");
         MessageWriter messageWriter = MessageWriter.of(sourceMap);
 
-        messageWriter.writeAll(usage, message);
+        messageWriter.writeAll(d-> d.getUsage()== usage, message);
 
         //when
         List<String> actuals = sources.stream()

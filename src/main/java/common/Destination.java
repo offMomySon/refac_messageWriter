@@ -1,3 +1,5 @@
+package common;
+
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,7 +34,7 @@ public class Destination {
 
     @Override
     public String toString() {
-        return "Destination{" +
+        return "common.Destination{" +
             "address=" + address +
             ", usage=" + usage +
             '}';
